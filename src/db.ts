@@ -23,6 +23,8 @@ export type Status = {
   indexedAt: string
 }
 
+
+
 export type AuthSession = {
   key: string
   session: AuthSessionJson

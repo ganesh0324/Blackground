@@ -1,4 +1,5 @@
 import type { Status } from '#/db'
+import { ProfileView } from '@atproto/api/dist/client/types/app/bsky/actor/defs'
 import { html } from '../lib/view'
 import { shell } from './shell'
 
@@ -40,7 +41,7 @@ type Props = {
   profile?: { displayName?: string }
   myStatus?: Status
   displayNameMap: Record<string, string>
-  followers?: string[]
+  followers?: ProfileView[]
 }
 
 export function home(props: Props) {
@@ -54,7 +55,11 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
-      <h1>Statusphere</h1>
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <img src="/assets/blackground.png" alt="BlackGround" style="width: 200px; height: 200px;">
+    </div>
+
+      <h1>BlackGround</h1>
       <p>Set your status on the Atmosphere.</p>
     </div>
     <div class="container">
@@ -108,10 +113,11 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
           </div>
         `
       })}
-      ${followers.map((follower, i) => {
-        return html`
-          <p>${follower}</p>
-        `
+      ${followers?.map((follower, i) => {
+        return html`  
+          <p>${i}. <h6>${follower.displayName}<h6> and the handle is <a href=${toBskyLink(follower.handle)}><b>${follower.handle}</a></b></p>
+          <img src=${follower.avatar ? follower.avatar : 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;">
+          `
       })}
     </div>
   </div>`

@@ -199,8 +199,8 @@ export const createRouter = (ctx: AppContext) => {
         actor: agent.assertDid,
         limit: 100,
       })
-      const followers = followers_res.data.followers.map((follower) => follower.displayName)
-      console.log(followers_res.data.followers.map((follower) => follower.displayName))
+      const followers = followers_res.data.followers
+      // console.log(followers_res.data.followers)
 
 
       for (const status of statuses) {
