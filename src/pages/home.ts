@@ -39,6 +39,8 @@ type Props = {
   didHandleMap: Record<string, string>
   profile?: { displayName?: string }
   myStatus?: Status
+  displayNameMap: Record<string, string>
+  followers?: string[]
 }
 
 export function home(props: Props) {
@@ -48,7 +50,7 @@ export function home(props: Props) {
   })
 }
 
-function content({ statuses, didHandleMap, profile, myStatus }: Props) {
+function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, followers }: Props) {
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
@@ -58,7 +60,7 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
     <div class="container">
       <div class="card">
         ${profile
-          ? html`<form action="/logout" method="post" class="session-form">
+      ? html`<form action="/logout" method="post" class="session-form">
               <div>
                 Hi, <strong>${profile.displayName || 'friend'}</strong>. What's
                 your status today?
@@ -67,7 +69,7 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
                 <button type="submit">Log out</button>
               </div>
             </form>`
-          : html`<div class="session-form">
+      : html`<div class="session-form">
               <div><a href="/login">Log in</a> to set your status!</div>
               <div>
                 <a href="/login" class="button">Log in</a>
@@ -76,19 +78,20 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
       </div>
       <form action="/status" method="post" class="status-options">
         ${STATUS_OPTIONS.map(
-          (status) =>
-            html`<button
+        (status) =>
+          html`<button
               class=${myStatus?.status === status
-                ? 'status-option selected'
-                : 'status-option'}
+              ? 'status-option selected'
+              : 'status-option'}
               name="status"
               value="${status}"
             >
               ${status}
             </button>`
-        )}
+      )}
       </form>
       ${statuses.map((status, i) => {
+        const name = displayNameMap[status.authorDid]
         const handle = didHandleMap[status.authorDid] || status.authorDid
         const date = ts(status)
         return html`
@@ -97,12 +100,17 @@ function content({ statuses, didHandleMap, profile, myStatus }: Props) {
               <div class="status">${status.status}</div>
             </div>
             <div class="desc">
-              <a class="author" href=${toBskyLink(handle)}>@${handle}</a>
+              <a class="author" href=${toBskyLink(handle)}>${name ? name : handle}</a>
               ${date === TODAY
-                ? `is feeling ${status.status} today`
-                : `was feeling ${status.status} on ${date}`}
+            ? `is feeling ${status.status} today`
+            : `was feeling ${status.status} on ${date}`}
             </div>
           </div>
+        `
+      })}
+      ${followers.map((follower, i) => {
+        return html`
+          <p>${follower}</p>
         `
       })}
     </div>

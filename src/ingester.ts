@@ -8,12 +8,12 @@ export function createIngester(db: Database, idResolver: IdResolver) {
   const logger = pino({ name: 'firehose ingestion' })
   return new Firehose({
     idResolver,
-    handleEvent: async (evt) => {
+    handleEvent: async (evt : any) => {
       // Watch for write events
       if (evt.event === 'create' || evt.event === 'update') {
         const now = new Date()
         const record = evt.record
-
+        
         // If the write is a valid status update
         if (
           evt.collection === 'xyz.statusphere.status' &&
@@ -46,10 +46,10 @@ export function createIngester(db: Database, idResolver: IdResolver) {
         await db.deleteFrom('status').where('uri', '=', evt.uri.toString()).execute()
       }
     },
-    onError: (err) => {
+    onError: (err : any) => {
       logger.error({ err }, 'error on firehose ingestion')
     },
-    filterCollections: ['xyz.statusphere.status'],
+    filterCollections: ['xyz.statusphere.status', 'app.bsky.graph.follow'],
     excludeIdentity: true,
     excludeAccount: true,
   })

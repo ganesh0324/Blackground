@@ -4,7 +4,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { OAuthResolverError } from '@atproto/oauth-client-node'
 import { isValidHandle } from '@atproto/syntax'
 import { TID } from '@atproto/common'
-import { Agent } from '@atproto/api'
+import { Agent, AtpAgent } from '@atproto/api'
 import express from 'express'
 import { getIronSession } from 'iron-session'
 import type { AppContext } from '#/index'
@@ -17,20 +17,30 @@ import * as Profile from '#/lexicon/types/app/bsky/actor/profile'
 
 type Session = { did: string }
 
+//explicit ProfileRecordType
+interface ProfileRecord {
+  value: {
+    displayName?: string;  // Optional because it might not exist
+    description?: string;
+  };
+}
+
+export type displayNameMap = Record<string, string>; //display name map ko lagi type
+
 // Helper function for defining routes
 const handler =
   (fn: express.Handler) =>
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      await fn(req, res, next)
-    } catch (err) {
-      next(err)
+    async (
+      req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ) => {
+      try {
+        await fn(req, res, next)
+      } catch (err) {
+        next(err)
+      }
     }
-  }
 
 // Helper function to get the Atproto Agent for the active session
 async function getSessionAgent(
@@ -78,7 +88,7 @@ export const createRouter = (ctx: AppContext) => {
           cookieName: 'sid',
           password: env.COOKIE_SECRET,
         })
-        assert(!clientSession.did, 'session already exists')
+        // assert(!clientSession.did, 'session already exists')
         clientSession.did = session.did
         await clientSession.save()
       } catch (err) {
@@ -146,8 +156,10 @@ export const createRouter = (ctx: AppContext) => {
   router.get(
     '/',
     handler(async (req, res) => {
+
       // If the user is signed in, get an agent which communicates with their server
       const agent = await getSessionAgent(req, res, ctx)
+
 
       // Fetch data stored in our SQLite
       const statuses = await ctx.db
@@ -158,11 +170,11 @@ export const createRouter = (ctx: AppContext) => {
         .execute()
       const myStatus = agent
         ? await ctx.db
-            .selectFrom('status')
-            .selectAll()
-            .where('authorDid', '=', agent.assertDid)
-            .orderBy('indexedAt', 'desc')
-            .executeTakeFirst()
+          .selectFrom('status')
+          .selectAll()
+          .where('authorDid', '=', agent.assertDid)
+          .orderBy('indexedAt', 'desc')
+          .executeTakeFirst()
         : undefined
 
       // Map user DIDs to their domain-name handles
@@ -170,9 +182,10 @@ export const createRouter = (ctx: AppContext) => {
         statuses.map((s) => s.authorDid)
       )
 
+      const displayNameMap: Record<string, string> = {}
       if (!agent) {
         // Serve the logged-out view
-        return res.type('html').send(page(home({ statuses, didHandleMap })))
+        return res.type('html').send(page(home({ statuses, didHandleMap, displayNameMap })))
       }
 
       // Fetch additional information about the logged-in user
@@ -181,9 +194,34 @@ export const createRouter = (ctx: AppContext) => {
         collection: 'app.bsky.actor.profile',
         rkey: 'self',
       })
+
+      const followers_res = await agent.app.bsky.graph.getFollowers({
+        actor: agent.assertDid,
+        limit: 100,
+      })
+      const followers = followers_res.data.followers.map((follower) => follower.displayName)
+      console.log(followers_res.data.followers.map((follower) => follower.displayName))
+
+
+      for (const status of statuses) {
+        try {
+          const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
+            repo: status.authorDid,
+            collection: 'app.bsky.actor.profile',
+            rkey: 'self',
+          });
+          displayNameMap[status.authorDid] =
+            profileRecord.value?.displayName; // Fallback to DID if no display name
+        }
+        catch (err) {
+          console.error(`Failed to fetch profile for DID ${status.authorDid}:`, err);
+          displayNameMap[status.authorDid] = status.authorDid;
+        }
+      }
+
       const profile =
         Profile.isRecord(profileRecord.value) &&
-        Profile.validateRecord(profileRecord.value).success
+          Profile.validateRecord(profileRecord.value).success
           ? profileRecord.value
           : {}
 
@@ -195,11 +233,54 @@ export const createRouter = (ctx: AppContext) => {
             didHandleMap,
             profile,
             myStatus,
+            displayNameMap,
+            followers
           })
         )
+
       )
     })
   )
+
+  // //fetching followers
+  // router.get('/followers', async (req, res) => {
+  //   try {
+  //     // Get authenticated user session
+  //     const agent = await getSessionAgent(req, res, ctx);
+
+  //     const reponse = agent?.com.atproto.repo.getRecord({
+  //       repo: agent.assertDid,
+  //       collection: 'app.bsky.graph.follow',
+  //       rkey : 
+  //     })
+
+  //     // Fetch followers using ATProto API
+  //     const response = await agent.api.app.bsky.graph.getFollowers({
+  //       actor: agent.session.did, // DID of the logged-in user
+  //       limit: 100,
+  //     });
+
+  //     // Resolve display names for followers
+  //     const followers = await Promise.all(
+  //       response.data.followers.map(async (follower) => {
+  //         const profile = await agent.api.app.bsky.actor.getProfile({
+  //           actor: follower.did,
+  //         });
+  //         return {
+  //           did: follower.did,
+  //           handle: follower.handle,
+  //           displayName: profile.data.displayName || follower.handle,
+  //         };
+  //       })
+  //     );
+
+  //     // Render followers page
+  //     res.render('followers', { followers });
+  //   } catch (err) {
+  //     console.error('Error fetching followers:', err);
+  //     res.status(500).send('Failed to load followers');
+  //   }
+  // });
 
   // "Set status" handler
   router.post(

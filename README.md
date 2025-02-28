@@ -1,13 +1,13 @@
-# AT Protocol "Statusphere" Example App
+# BlackGround : An ATProto Social Media Implementation
 
-An example application covering:
+An application (based on Statusphere example by ATProtocol) covering:
 
 - Signin via OAuth
 - Fetch information about users (profiles)
 - Listen to the network firehose for new data
 - Publish data on the user's account using a custom schema
 
-See https://atproto.com/guides/applications for a guide through the codebase.
+And a somewhat functional social media which federates with the AT Protocol Network.
 
 ## Getting Started
 
