@@ -1,19 +1,22 @@
-# BlackGround : An ATProto Social Media Implementation
+# BlackGround: An ATProto-Based Social Media Platform
 
-An application (based on Statusphere example by ATProtocol) covering:
+BlackGround is a social media application built on the AT Protocol, inspired by the Statusphere example. It enables users to:
 
-- Signin via OAuth
-- Fetch information about users (profiles)
-- Listen to the network firehose for new data
-- Publish data on the user's account using a custom schema
+•Sign in using OAuth authentication
 
-And a somewhat functional social media which federates with the AT Protocol Network.
+•Retrieve user profile information
+
+•Monitor the network firehose for real-time updates
+
+•Publish content on user accounts using a custom schema
+
+This project aims to create a functional, federated social media platform that integrates seamlessly with the AT Protocol Network.
 
 ## Getting Started
 
 ```sh
-git clone https://github.com/bluesky-social/statusphere-example-app.git
-cd statusphere-example-app
+git clone https://github.com/ganesh0324/Blackground.git
+cd Blackground
 cp .env.template .env
 npm install
 npm run dev
