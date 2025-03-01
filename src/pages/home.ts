@@ -52,6 +52,7 @@ export function home(props: Props) {
 }
 
 function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, followers }: Props) {
+  console.log("In the home page: ", followers)
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
@@ -113,14 +114,31 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
           </div>
         `
       })}
-      ${followers?.map((follower, i) => {
-        return html`  
-          <p>${i}. <h6>${follower.displayName}<h6> and the handle is <a href=${toBskyLink(follower.handle)}><b>${follower.handle}</a></b></p>
-          <img src=${follower.avatar ? follower.avatar : 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;">
+      ${//followers is received
+    // followers ? followers.map((follower, i) => { return html`<img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>` })
+    //   : 'dhiru dost'
+    followers ?
+      followers.map((follower, i) => {
+        const did = follower.did;
+        console.log("Follower: ", follower)
+        // return html`<p><a href=${toProfileLink(did)}>${follower.did}</a></p>`
+        return html`
+          <p>${i + 1}. <h5>${follower.displayName || 'Gannu Dost'}</h5></p>
+          <p>Handle: <b><a href=${toProfileLink(follower.did)}>${follower.handle}</a></b></p>
+          <div class ="display_image">
+            <img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>
+          </div>
           `
-      })}
+      }) : html`<p>No followers retrieved</p>`
+    }
     </div>
   </div>`
+}
+
+// /profile?did=${follower.did.toString()}
+
+function toProfileLink(did: string) {
+  return `/profile/${did}`
 }
 
 function toBskyLink(did: string) {

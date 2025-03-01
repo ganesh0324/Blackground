@@ -4,7 +4,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import { OAuthResolverError } from '@atproto/oauth-client-node'
 import { isValidHandle } from '@atproto/syntax'
 import { TID } from '@atproto/common'
-import { Agent, AtpAgent } from '@atproto/api'
+import { Agent } from '@atproto/api'
 import express from 'express'
 import { getIronSession } from 'iron-session'
 import type { AppContext } from '#/index'
@@ -14,6 +14,8 @@ import { env } from '#/lib/env'
 import { page } from '#/lib/view'
 import * as Status from '#/lexicon/types/xyz/statusphere/status'
 import * as Profile from '#/lexicon/types/app/bsky/actor/profile'
+import { profile } from 'node:console'
+import { profile_page } from './pages/profile'
 
 type Session = { did: string }
 
@@ -156,11 +158,13 @@ export const createRouter = (ctx: AppContext) => {
   router.get(
     '/',
     handler(async (req, res) => {
-
+      console.log("In the main page")
+      console.log("Getting session agent in home page")
       // If the user is signed in, get an agent which communicates with their server
       const agent = await getSessionAgent(req, res, ctx)
 
 
+      console.log("Fetcing data from database in home page")
       // Fetch data stored in our SQLite
       const statuses = await ctx.db
         .selectFrom('status')
@@ -177,6 +181,7 @@ export const createRouter = (ctx: AppContext) => {
           .executeTakeFirst()
         : undefined
 
+      console.log("resolving dids in home page")
       // Map user DIDs to their domain-name handles
       const didHandleMap = await ctx.resolver.resolveDidsToHandles(
         statuses.map((s) => s.authorDid)
@@ -184,10 +189,12 @@ export const createRouter = (ctx: AppContext) => {
 
       const displayNameMap: Record<string, string> = {}
       if (!agent) {
+        console.log("serving the logged out view in home page")
         // Serve the logged-out view
         return res.type('html').send(page(home({ statuses, didHandleMap, displayNameMap })))
       }
 
+      console.log("Fetching the profile in home page")
       // Fetch additional information about the logged-in user
       const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
         repo: agent.assertDid,
@@ -195,14 +202,15 @@ export const createRouter = (ctx: AppContext) => {
         rkey: 'self',
       })
 
-      const followers_res = await agent.app.bsky.graph.getFollowers({
-        actor: agent.assertDid,
-        limit: 100,
-      })
-      const followers = followers_res.data.followers
-      // console.log(followers_res.data.followers)
 
 
+      const profile =
+        Profile.isRecord(profileRecord.value) &&
+          Profile.validateRecord(profileRecord.value).success
+          ? profileRecord.value
+          : {}
+
+      // Resolve display names for statuses
       for (const status of statuses) {
         try {
           const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
@@ -219,11 +227,15 @@ export const createRouter = (ctx: AppContext) => {
         }
       }
 
-      const profile =
-        Profile.isRecord(profileRecord.value) &&
-          Profile.validateRecord(profileRecord.value).success
-          ? profileRecord.value
-          : {}
+      console.log("Fetching the followers in home page")
+      //get the followers of the user
+      const followers_res = await agent.app.bsky.graph.getFollowers({
+        actor: agent.assertDid,
+        limit: 100,
+      })
+
+      const followers = followers_res.data.followers
+      // console.log(followers)
 
       // Serve the logged-in view
       return res.type('html').send(
@@ -281,6 +293,42 @@ export const createRouter = (ctx: AppContext) => {
   //     res.status(500).send('Failed to load followers');
   //   }
   // });
+
+  router.get(
+    '/profile/:did',
+    handler(async (req, res) => {
+      console.log("I'm in the profile handler")
+      // If the user is signed in, get an agent which communicates with their server
+      console.log("The parameters are: ", req.params)
+      const agent = await getSessionAgent(req, res, ctx)
+      if (!req.params) {
+        return res.status(400).send('Missing DID');
+      }
+
+      const { did } = req.params; // Extract DID from path
+      console.log("The received did is: ", did)
+
+      const profileDid: string = did.toString();
+      if (!profileDid) {
+        return res.status(400).send('Missing DID');
+      }
+
+
+      const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
+        repo: profileDid,
+        collection: 'app.bsky.actor.profile',
+        rkey: 'self',
+      });
+
+      const profile =
+        Profile.isRecord(profileRecord.value) &&
+          Profile.validateRecord(profileRecord.value).success
+          ? profileRecord.value
+          : {}
+      res.type('html').send(
+        page(
+          profile_page({ profile })))
+    }))
 
   // "Set status" handler
   router.post(
