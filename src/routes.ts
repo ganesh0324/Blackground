@@ -16,16 +16,9 @@ import * as Status from '#/lexicon/types/xyz/statusphere/status'
 import * as Profile from '#/lexicon/types/app/bsky/actor/profile'
 import { profile } from 'node:console'
 import { profile_page } from './pages/profile'
+import { ProfileView } from '@atproto/api/dist/client/types/app/bsky/actor/defs'
 
 type Session = { did: string }
-
-//explicit ProfileRecordType
-interface ProfileRecord {
-  value: {
-    displayName?: string;  // Optional because it might not exist
-    description?: string;
-  };
-}
 
 export type displayNameMap = Record<string, string>; //display name map ko lagi type
 
@@ -299,7 +292,7 @@ export const createRouter = (ctx: AppContext) => {
     handler(async (req, res) => {
       console.log("I'm in the profile handler")
       // If the user is signed in, get an agent which communicates with their server
-      console.log("The parameters are: ", req.params)
+
       const agent = await getSessionAgent(req, res, ctx)
       if (!req.params) {
         return res.status(400).send('Missing DID');
@@ -314,20 +307,27 @@ export const createRouter = (ctx: AppContext) => {
       }
 
 
-      const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
-        repo: profileDid,
-        collection: 'app.bsky.actor.profile',
-        rkey: 'self',
+      // Fetch the profile using the proper API endpoint
+      const profileResponse = await agent.app.bsky.actor.getProfile({
+        actor: profileDid
       });
+      const profile = profileResponse.data;
 
-      const profile =
-        Profile.isRecord(profileRecord.value) &&
-          Profile.validateRecord(profileRecord.value).success
-          ? profileRecord.value
-          : {}
+
+      const response = await agent.app.bsky.feed.getAuthorFeed({
+        actor: profileDid, // The user's DID
+        limit: 10
+      });
+      const feed = response.data.feed;
+      // feed.forEach((post, i) => {
+      //   console.log("Post Number: ", i + 1, post.post.record.text);
+      // });
+
+
       res.type('html').send(
         page(
-          profile_page({ profile })))
+          profile_page({ profile, posts: feed }))
+      );
     }))
 
   // "Set status" handler

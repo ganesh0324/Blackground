@@ -52,7 +52,6 @@ export function home(props: Props) {
 }
 
 function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, followers }: Props) {
-  console.log("In the home page: ", followers)
   return html`<div id="root">
     <div class="error"></div>
     <div id="header">
@@ -68,8 +67,7 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
         ${profile
       ? html`<form action="/logout" method="post" class="session-form">
               <div>
-                Hi, <strong>${profile.displayName || 'friend'}</strong>. What's
-                your status today?
+                Hi, <strong>${profile.displayName || 'friend'}</strong>. How are you feeling?
               </div>
               <div>
                 <button type="submit">Log out</button>
