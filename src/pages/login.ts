@@ -13,7 +13,7 @@ export function login(props: Props) {
 function content({ error }: Props) {
   return html`<div id="root">
     <div id="header">
-      <h1>Statusphere</h1>
+      <h1>BlackGround</h1>
       <p>Set your status on the Atmosphere.</p>
     </div>
     <div class="container">
@@ -21,7 +21,7 @@ function content({ error }: Props) {
         <input
           type="text"
           name="handle"
-          placeholder="Enter your handle (eg alice.bsky.social)"
+          placeholder="Enter your handle (eg blaugranesh.bsky.social)"
           required
         />
         <button type="submit">Log in</button>

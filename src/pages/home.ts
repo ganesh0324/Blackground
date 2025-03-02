@@ -52,7 +52,10 @@ export function home(props: Props) {
 }
 
 function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, followers }: Props) {
-  return html`<div id="root">
+    console.log("In the home page, followers: ")
+    followers?.forEach(follower => {
+      console.log(follower.displayName)})
+    return html`<div id="root">
     <div class="error"></div>
     <div id="header">
     <div style="display: flex; justify-content: center; align-items: center;">
@@ -112,28 +115,18 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
           </div>
         `
       })}
-      ${//followers is received
-    // followers ? followers.map((follower, i) => { return html`<img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>` })
-    //   : 'dhiru dost'
-    followers ?
-      followers.map((follower, i) => {
-        const did = follower.did;
-        console.log("Follower: ", follower)
-        // return html`<p><a href=${toProfileLink(did)}>${follower.did}</a></p>`
-        return html`
-          <p>${i + 1}. <h5>${follower.displayName || 'Gannu Dost'}</h5></p>
+      ${followers?.map((follower, i) => {
+          return html	`<p>${i+1}. ${follower.displayName}</p>
           <p>Handle: <b><a href=${toProfileLink(follower.did)}>${follower.handle}</a></b></p>
           <div class ="display_image">
-            <img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>
+             <img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>
           </div>
           `
-      }) : html`<p>No followers retrieved</p>`
-    }
+        }
+    )}
     </div>
   </div>`
 }
-
-// /profile?did=${follower.did.toString()}
 
 function toProfileLink(did: string) {
   return `/profile/${did}`
