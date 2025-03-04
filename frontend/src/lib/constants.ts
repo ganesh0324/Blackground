@@ -4,8 +4,8 @@ export const samplePosts: Feed = {
   Discover: [
     {
       id: 1,
-      username: "Jane Doe",
-      handle: "janedoe",
+      username: "Dhiru Don",
+      handle: "dhireyy",
       avatarSrc: "",
       content:
         "Just launched my new project! Check it out and let me know what you think. #NewProject #Excited",
@@ -13,32 +13,35 @@ export const samplePosts: Feed = {
       likes: 24,
       comments: 5,
       shares: 3,
+      retweets: 12,
     },
     {
       id: 2,
-      username: "John Smith",
-      handle: "johnsmith",
+      username: "biggie",
+      handle: "chiggie",
       avatarSrc: "",
       imageSrc: "/placeholder.jpg",
 
       content:
-        "Had an amazing time at the tech conference today. So many inspiring talks and great networking opportunities!",
-      timeAgo: "5h",
-      likes: 42,
-      comments: 8,
+        "Shadows create their own reality. #Shadows #Reality #Perception",
+      timeAgo: "3h",
+      likes: 427,
+      comments: 81,
       shares: 2,
+      retweets: 50,
     },
     {
       id: 3,
-      username: "Alice Johnson",
-      handle: "alicej",
+      username: "Bajra",
+      handle: "kalobajra",
       avatarSrc: "",
       content:
         "Just finished reading an incredible book on AI and its impact on society. Highly recommend it to everyone interested in tech and ethics!",
       timeAgo: "1d",
       likes: 56,
       comments: 12,
-      shares: 7,
+      shares: 7,  
+      retweets: 8,
     },
   ],
   Following: [
@@ -53,6 +56,7 @@ export const samplePosts: Feed = {
       likes: 1024,
       comments: 302,
       shares: 576,
+      retweets: 120,
     },
   ],
   Trending: [
@@ -67,6 +71,7 @@ export const samplePosts: Feed = {
       likes: 3420,
       comments: 892,
       shares: 1205,
+      retweets: 430,
     },
   ],
   "Hot Topics": [
@@ -81,6 +86,7 @@ export const samplePosts: Feed = {
       likes: 156,
       comments: 48,
       shares: 23,
+      retweets : 12,
     },
   ],
 };

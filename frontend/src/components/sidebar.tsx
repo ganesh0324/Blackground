@@ -76,7 +76,7 @@ export default function AppSidebar({
           <Sidebar className="border-r border-border pl-36 pr-8">
             <SidebarHeader className="py-8">
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold">Blackground</h1>
+                <h1 className="text-2xl font-bold">BlackGround</h1>
               </div>
             </SidebarHeader>
             <SidebarContent className="mb-8">
@@ -100,11 +100,12 @@ export default function AppSidebar({
               </SidebarMenu>
 
               <CreatePostDialog>
-                <Button className="flex items-center rounded-full h-12">
-                  <PlusCircle className="h-6 w-6" />
-                  <span className="font-semibold text-md">Create Post</span>
-                </Button>
-              </CreatePostDialog>
+                 <Button className="rounded-full h-12 px-6  bg-blue-700 text-white ">
+                 <span className="font-semibold text-md">Create Post</span>
+                 </Button>
+                 </CreatePostDialog>
+
+
             </SidebarContent>
             <SidebarFooter className="p-4">
               <div className="flex items-center gap-3">
@@ -116,9 +117,9 @@ export default function AppSidebar({
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 overflow-hidden">
-                  <p className="truncate text-sm font-medium">User Name</p>
+                  <p className="truncate text-sm font-medium">Ganesh Parajuli</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    @username
+                    @blaugranesh
                   </p>
                 </div>
                 <Button

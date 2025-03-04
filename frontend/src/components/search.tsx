@@ -7,7 +7,7 @@ interface SearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Search({
-  placeholder = "Search...",
+  placeholder = "Search",
   className,
   ...props
 }: SearchProps) {
