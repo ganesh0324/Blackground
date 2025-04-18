@@ -59,7 +59,6 @@ export class SessionStore implements NodeSavedSessionStore {
 
 // client.ts
 export const createClient = async (db: Database) => {
-  console.log("OAuth Client Creating starting here: ");
   const publicUrl = env.PUBLIC_URL;
   const url = publicUrl || `http://127.0.0.1:${env.PORT}`;
   const enc = encodeURIComponent;

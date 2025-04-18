@@ -3,9 +3,9 @@ import { IdResolver } from "@atproto/identity";
 import { Firehose } from "@atproto/sync";
 import type { Database } from "../db";
 import * as Status from "@/lexicon/types/xyz/statusphere/status";
+import {logger } from "@/lib/logger"
 
 export function createIngester(db: Database, idResolver: IdResolver) {
-  const logger = pino({ name: "firehose ingestion" });
   return new Firehose({
     idResolver,
     handleEvent: async (evt: any) => {

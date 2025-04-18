@@ -1,11 +1,12 @@
 import { formSchema } from "@/lib/schemas";
 import { NextRequest, NextResponse } from "next/server";
-import { getAppContext, initializeContext } from "@/lib/context/server";
+import { initializeContext } from "@/lib/context/server";
 import { isValidHandle } from "@atproto/syntax";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
-  const { oauthClient, logger } = await initializeContext();
+  const { oauthClient } = await initializeContext();
 
   const result = formSchema.safeParse(data);
 
@@ -23,7 +24,6 @@ export async function POST(request: NextRequest) {
     const url = await oauthClient.authorize(handle.toString(), {
       scope: "atproto transition:generic",
     });
-    console.log(url);
     return NextResponse.json(url);
   } catch (err) {
     logger.error({ err }, "oauth authorize failed");

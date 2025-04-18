@@ -1,26 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionAgent } from "@/lib/auth/agent";
+import { getSession } from "@/lib/auth/agent";
+import { logger } from "@/lib/logger";
 
-type Session = { did: string };
 
 export async function GET(request: NextRequest, response: NextResponse) {
-    const agent = await getSessionAgent();
+    // const agent = await getSessionAgent();
+    const clientSession = await getSession();
 
-    if (!agent) {
-        return new Response("Unauthorized", { status: 401 });
-    }
+    clientSession.did = "Dhireyy";
+    await clientSession.save();
+
+    const sesh = await getSession();
+    logger.info("Session as from Client: ", sesh.did);
 
     try {
-        const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
-            repo: agent.assertDid,
-            collection: "app.bsky.actor.profile",
-            rkey: "self",
-        })
+        // const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
+        //     repo: agent.assertDid,
+        //     collection: "app.bsky.actor.profile",
+        //     rkey: "self",
+        // })
 
         // Safely extract the displayName
-        const displayName = profileRecord.value?.displayName || "Dhireyy"
+        // const displayName = profileRecord.value?.displayName || "Dhireyy"
 
-        return Response.json({ name: displayName })
+        return Response.json({ name: "Dhireyy" })
     } catch (err) {
         console.error("Error fetching profile:", err)
         return new Response("Error fetching profile", { status: 500 })

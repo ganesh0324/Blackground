@@ -25,7 +25,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  console.log("server initializing nowww!")
   await initializeContext();
   return (
     <html lang="en" className="dark">

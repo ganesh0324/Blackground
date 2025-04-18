@@ -75,7 +75,6 @@ migrations["001"] = {
 
 // APIs
 export const createDb = (location: string): Database => {
-  console.log("Database Created Here");
   return new Kysely<DatabaseSchema>({
     dialect: new SqliteDialect({
       database: new SqliteDb(location),

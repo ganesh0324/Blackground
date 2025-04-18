@@ -12,11 +12,10 @@ import {
   createIdResolver,
   createBidirectionalResolver,
 } from "./resolver";
-
+import { logger } from "@/lib/logger"
 export type AppContextType = {
   db: Database;
   ingester: Firehose;
-  logger: pino.Logger;
   oauthClient: OAuthClient;
   resolver: BidirectionalResolver;
 };
@@ -24,10 +23,9 @@ export type AppContextType = {
 let appContext: AppContextType | null = null;
 
 export async function initializeContext(): Promise<AppContextType> {
-  if (appContext) return appContext;
-
-  const logger = pino({ name: "server start" });
-  logger.info("Initializing server...");
+  if (appContext) {
+    return appContext;
+  }
 
   const db = createDb(env.DB_PATH);
   migrateToLatest(db);
@@ -41,20 +39,8 @@ export async function initializeContext(): Promise<AppContextType> {
   appContext = {
     db,
     ingester,
-    logger,
     oauthClient,
     resolver,
   };
-
-  logger.info("Server initialized 🎉");
-
-  return appContext;
-}
-
-// Safe accessor
-export function getAppContext(): AppContextType {
-  if (!appContext) {
-    throw new Error("AppContext not initialized. Did you forget to call initializeContext()?");
-  }
   return appContext;
 }

@@ -1,31 +1,18 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Post } from "@/components/feed/post"
 import { samplePosts } from "@/lib/constants"
 import { Edit, Settings, Users } from "lucide-react"
-import { useEffect, useState} from "react"
 
 export default function ProfilePage() {
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  const [user, setUser] = useState(null)
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const res = await fetch("/api/profile")
-        const data = await res.json()
-        console.log("The user's name here is: ", data.name);
-      } catch (err) {
-        console.error("Failed to fetch profile:", err)
-      }
-    }
-
-    fetchProfile()
-  }, [])
-
-  // Sample user data - in a real app, this would come from an API or state
   const duser = {
     name: "User Name",
     handle: "username",
@@ -35,6 +22,30 @@ export default function ProfilePage() {
     posts: 128,
     joinedDate: "January 2023",
   }
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        console.log("FETCHING PROFILE DETAILS NOW!")
+
+        const res = await fetch("/api/profile")
+
+        if (!res.ok) throw new Error("Failed to fetch profile")
+        const data = await res.json()
+        duser.name = data.name
+        setUser(duser)
+      } catch (err) {
+        setError("Failed to load profile")
+        console.error("Fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [])
+
+  if (loading) return <p className="p-8 text-center">Loading profile...</p>
+  if (error || !user) return <p className="p-8 text-center text-red-500">{error}</p>
 
   return (
     <div className="flex flex-col min-h-screen">
