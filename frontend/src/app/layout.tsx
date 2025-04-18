@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import AppSidebar from "@/components/sidebar";
+import { initializeContext } from "@/lib/context/server";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,11 +20,13 @@ export const metadata: Metadata = {
   description: "Decentralized social media for everyone",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("server initializing nowww!")
+  await initializeContext();
   return (
     <html lang="en" className="dark">
       <body

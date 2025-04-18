@@ -1,7 +1,7 @@
 import pino from "pino";
 import { IdResolver } from "@atproto/identity";
 import { Firehose } from "@atproto/sync";
-import type { Database } from "../../app/_lib/db";
+import type { Database } from "../db";
 import * as Status from "@/lexicon/types/xyz/statusphere/status";
 
 export function createIngester(db: Database, idResolver: IdResolver) {

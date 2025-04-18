@@ -52,10 +52,11 @@ export function home(props: Props) {
 }
 
 function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, followers }: Props) {
-    console.log("In the home page, followers: ")
-    followers?.forEach(follower => {
-      console.log(follower.displayName)})
-    return html`<div id="root">
+  console.log("In the home page, followers: ")
+  followers?.forEach(follower => {
+    console.log(follower.displayName)
+  })
+  return html`<div id="root">
     <div class="error"></div>
     <div id="header">
     <div style="display: flex; justify-content: center; align-items: center;">
@@ -116,17 +117,19 @@ function content({ statuses, didHandleMap, profile, myStatus, displayNameMap, fo
         `
       })}
       ${followers?.map((follower, i) => {
-          return html	`<p>${i+1}. ${follower.displayName}</p>
+        return html`<p>${i + 1}. ${follower.displayName}</p>
           <p>Handle: <b><a href=${toProfileLink(follower.did)}>${follower.handle}</a></b></p>
           <div class ="display_image">
              <img src=${follower.avatar || 'assets/dost.jpg'} alt="Avatar" style="width:100px;height:100px;"/>
           </div>
           `
-        }
-    )}
+      }
+      )}
     </div>
   </div>`
 }
+
+
 
 function toProfileLink(did: string) {
   return `/profile/${did}`

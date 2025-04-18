@@ -1,11 +1,11 @@
 import { formSchema } from "@/lib/schemas";
 import { NextRequest, NextResponse } from "next/server";
-import { getContext } from "@/lib/context/server";
+import { getAppContext, initializeContext } from "@/lib/context/server";
 import { isValidHandle } from "@atproto/syntax";
 
 export async function POST(request: NextRequest) {
   const data = await request.json();
-  const { oauthClient, logger } = await getContext();
+  const { oauthClient, logger } = await initializeContext();
 
   const result = formSchema.safeParse(data);
 

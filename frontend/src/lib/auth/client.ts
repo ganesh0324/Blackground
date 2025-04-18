@@ -5,8 +5,8 @@ import {
   NodeSavedSession,
   NodeSavedSessionStore,
 } from "@atproto/oauth-client-node";
-import type { Database } from "../../app/_lib/db";
-import { env } from "../../app/_lib/env";
+import type { Database } from "../db";
+import { env } from "../env";
 
 // storage.ts
 export class StateStore implements NodeSavedStateStore {
@@ -59,6 +59,7 @@ export class SessionStore implements NodeSavedSessionStore {
 
 // client.ts
 export const createClient = async (db: Database) => {
+  console.log("OAuth Client Creating starting here: ");
   const publicUrl = env.PUBLIC_URL;
   const url = publicUrl || `http://127.0.0.1:${env.PORT}`;
   const enc = encodeURIComponent;

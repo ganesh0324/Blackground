@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Post } from "@/components/feed/post";
 import { FeedTab } from "@/types";
@@ -11,10 +10,16 @@ import { samplePosts } from "@/lib/constants";
 import ExplorePanel from "@/components/feed/explore-panel";
 import Image from "next/image";
 import { Logo } from "@/components/icons";
+import { initializeContext } from "@/lib/context/server";
+import { initialize } from "next/dist/server/lib/render-server";
+
 
 const tabs: FeedTab[] = ["Discover", "Following", "Trending", "Hot Topics"];
 
-export default function HomePage() {
+// await initializeContext();
+
+export default async function HomePage() {
+  // await initializeContext();
   const { open, setOpen } = useSidebar();
   const [activeTab, setActiveTab] = useState<FeedTab>("Discover");
 

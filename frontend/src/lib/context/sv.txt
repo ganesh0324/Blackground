@@ -1,0 +1,158 @@
+// import { pino } from "pino";
+// import type { OAuthClient } from "@atproto/oauth-client-node";
+// import { Firehose } from "@atproto/sync";
+
+// import { createDb, Database, migrateToLatest } from "../../app/_lib/db";
+// import { env } from "../../app/_lib/env";
+// import { createIngester } from "./ingester";
+// import { createClient } from "../auth/client";
+// import {
+//   BidirectionalResolver,
+//   createIdResolver,
+//   createBidirectionalResolver,
+// } from "./resolver";
+
+// export type AppContext = {
+//   db: Database;
+//   ingester: Firehose;
+//   logger: pino.Logger;
+//   oauthClient: OAuthClient;
+//   resolver: BidirectionalResolver;
+// };
+
+// let globalContext: AppContext | undefined;
+
+// export function runServer() {
+//   initialiseServer().then(() => {
+//     console.log("Server initialised");
+//   });
+// }
+
+// // Function to initialise server context
+// export async function initialiseServer() {
+//   console.log("Server is initializing 🥳")
+//   if (globalContext) return globalContext;
+
+//   const db = createDb(env.DB_PATH);
+//   migrateToLatest(db);
+
+//   const oauthClient = await createClient(db);
+//   const baseIdResolver = createIdResolver();
+//   const ingester = createIngester(db, baseIdResolver);
+//   const resolver = createBidirectionalResolver(baseIdResolver);
+//   const logger = pino({ name: "server start" });
+
+//   const ctx: AppContext = {
+//     db,
+//     ingester,
+//     logger,
+//     resolver,
+//     oauthClient,
+//   };
+//   // ingester.start();
+//   logger.info(`Server initialised in ${env.NODE_ENV} environent`);
+
+//   globalContext = ctx;
+
+//   return ctx;
+// }
+
+// // Function to get global server context
+// export async function getContext() {
+//   if (!globalContext) {
+//     return await initialiseServer();
+//   }
+//   return globalContext;
+// }
+
+// // Function to remove server context
+// export async function closeServer() {
+//   if (globalContext) {
+//     const { ingester, logger } = globalContext;
+//     // await ingester.destroy();
+//     logger.info("server closed");
+//   }
+// }
+
+// runServer();
+
+
+import { pino } from "pino";
+import type { OAuthClient } from "@atproto/oauth-client-node";
+import { Firehose } from "@atproto/sync";
+import { createDb, Database, migrateToLatest } from "../db";
+import { env } from "../env";
+import { createIngester } from "./ingester";
+import { createClient } from "../auth/client";
+import {
+  BidirectionalResolver,
+  createIdResolver,
+  createBidirectionalResolver,
+} from "./resolver";
+
+export class AppContext {
+  public db: Database; // Database type
+  public ingester: Firehose; // Ingester type
+  public logger: pino.Logger; // Logger type
+  public oauthClient: OAuthClient | null = null; // OAuth client type, initialized asynchronously
+  public resolver: BidirectionalResolver; // Resolver type
+
+  private static instance: AppContext | undefined; // Singleton instance
+
+  // Private constructor to prevent external instantiation
+  private constructor() {
+    // Initialize other components that don't require async initialization
+    console.log("Initializing AppContext...");
+
+    // Initialize the database
+    this.db = createDb(env.DB_PATH);
+    migrateToLatest(this.db);
+
+    // Initialize other services/components
+    const baseIdResolver = createIdResolver();
+    this.ingester = createIngester(this.db, baseIdResolver);
+    this.resolver = createBidirectionalResolver(baseIdResolver);
+
+    // Initialize the logger (pino or any other logger)
+    this.logger = pino({ name: "server start" });
+  }
+
+  // Public method to get the singleton instance
+  public static getInstance(): AppContext {
+    if (!AppContext.instance) {
+      AppContext.instance = new AppContext(); // Initialize the context if not already done
+    }
+    return AppContext.instance;
+  }
+
+  // Async method to initialize async components like OAuthClient
+  public async initialize() {
+    if (!this.oauthClient) {
+      this.oauthClient = await createClient(this.db); // Initialize the OAuth client asynchronously
+      this.logger.info(`OAuth client initialized`);
+    }
+  }
+
+  // Optional: Clean up resources (e.g., ingester, logger) if necessary
+  public async close() {
+    if (AppContext.instance) {
+      const { ingester, logger } = AppContext.instance;
+      // await ingester.destroy();
+      logger.info("Server closed");
+    }
+  }
+}
+
+export appContext: AppContext;
+
+
+// You need to call initialize() when using appContext
+export async function initializeContext() {
+  const context = AppContext.getInstance(); //aru
+  await context.initialize(); // Initialize oauth
+
+  
+  context.logger.info("Context initialized");
+
+  appContext =  context;
+}
