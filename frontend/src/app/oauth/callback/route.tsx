@@ -1,80 +1,60 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import { getIronSession } from "iron-session";
-// import { initializeContext } from "@/lib/context/server";
-// import { env } from "@/lib/env";
-// import assert from "node:assert";
-// import { cookies } from "next/headers";
-// import {logger} from "@/lib/logger"
-
-// type Session = { did: string };
-
-// export async function GET(request: NextRequest) {
-//   logger.info("OAUTH CALLBACK HEREE BROO!!!")
-//   const params = request.nextUrl.searchParams;
-//   const { oauthClient } = await initializeContext();
-  
-//   try {
-//     const { session } = await oauthClient.callback(params);
-//     // console.log("OAUTH PARAMETER: ", session)
-
-//     // Fix: Cast `request` to `Request` for compatibility
-//     const clientSession = await getIronSession<Session>(cookies(), {
-//       cookieName: "sid",
-//       password: env.COOKIE_SECRET,
-//     });
-
-//     if(clientSession.did) {
-//       logger.info("Destroying existing session here. ")
-//       await clientSession.destroy()
-//     }
-
-//     clientSession.did = session.did;
-//     await clientSession.save();
-    
-//     logger.info("Session save hudei: ", clientSession.did)
-//     return NextResponse.redirect(new URL("/profile", request.url));
-//   } catch (err) {
-//     logger.error({ err }, "oauth callback failed");
-//     return NextResponse.redirect(new URL("/?error", request.url));
-//   }
-// }
-
-// app/api/oauth/callback/route.ts
-
-import { NextRequest, NextResponse } from "next/server";
-import { getIronSession } from "iron-session";
+import { createUser } from "@/app/functions/create-user";
+import getSession, { Session } from "@/lib/auth/agent";
 import { initializeContext } from "@/lib/context/server";
+import { env } from "@/lib/env";
+import { sessionOptions } from "@/lib/sessionOptions";
+import { Agent } from "@atproto/api";
+import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import {logger} from "@/lib/logger";
-import { Session, sessionOptions } from "@/lib/sessionOptions";
-import { getSession } from "@/lib/auth/agent";
-
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  const params = request.nextUrl.searchParams;
-  const { oauthClient } = await initializeContext();
+  // Get the next URL from the request
+  const nextUrl = request.nextUrl;
 
   try {
-    const { session } = await oauthClient.callback(params);
-    const cookieStore = await cookies();
+    // Create a Bluesky client
+    const { oauthClient } = await initializeContext();
 
-    const clientSession = await getSession();
+    // Get the session and state from the callback
+    const { session } = await oauthClient.callback(nextUrl.searchParams);
+    console.log("Session: ", session);
 
-    // Clear previous if exists
-    if (clientSession.did) {
-      await clientSession.destroy();
+    // Create an agent
+    const agent = new Agent(session);
+
+    // Get the profile of the user
+    const { data } = await agent.getProfile({
+      actor: session.did,
+    });
+
+    // Create a user from the Bluesky profile
+    const ironSession = await getIronSession<Session>(
+      cookies(),
+      sessionOptions
+    );
+
+    // Save the user to the session
+    ironSession.user = createUser(data);
+
+    // Save the session
+    await ironSession.save();
+    console.log("Iron Session: ", ironSession);
+    // Redirect to the private page
+    return NextResponse.redirect(
+      new URL(`${env.PUBLIC_URL}/profile`, request.url)
+    );
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      // Bluesky error
+      return NextResponse.redirect(
+        `${env.PUBLIC_URL}/oauth/login?error=${e.message}`
+      );
+    } else {
+      // Unknown error
+      return NextResponse.redirect(
+        `${env.PUBLIC_URL}/oauth/login?error=Unknown_error`
+      );
     }
-
-    // Save the new session
-    clientSession.did = session.did;
-    await clientSession.save();
-
-    const sesh = await getSession();
-    console.log("After Sessionn Saved: ", sesh.did);
-
-    return NextResponse.redirect(new URL("/profile", request.url));
-  } catch (err) {
-    logger.error({ err }, "OAuth callback failed");
-    return NextResponse.redirect(new URL("/?error", request.url));
   }
 }
