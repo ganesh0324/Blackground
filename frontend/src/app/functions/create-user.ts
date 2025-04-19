@@ -5,7 +5,8 @@ export type User = {
   did: string;
   handle: string;
   name: string;
-  avatar: string | null;
+  avatar?: string | null;
+  banner? : string | null;
 };
 
 // Create a user
@@ -15,5 +16,6 @@ export function createUser(data: AppBskyActorDefs.ProfileViewDetailed): User {
     handle: data.handle,
     name: data.displayName || data.handle,
     avatar: data.avatar || null,
+    banner: data.banner || null,
   };
 }

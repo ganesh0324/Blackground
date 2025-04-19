@@ -1,6 +1,7 @@
+import { User } from "@/app/functions/create-user";
 import { env } from "./env";
 
-export type Session = { did: string };
+export type Session = { user: User };
 
 export const sessionOptions = {
   cookieName: "sid",

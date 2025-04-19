@@ -1,6 +1,6 @@
 export const runtime = "nodejs";
 
-import getSession, { Session } from "@/lib/auth/agent";
+import { Session } from "@/lib/sessionOptions";
 import { sessionOptions } from "@/lib/sessionOptions";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";

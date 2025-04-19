@@ -1,27 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth/agent";
+import { getSession, getSessionAgent } from "@/lib/auth/agent";
 import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { createUser } from "@/app/functions/create-user";
 
-export async function GET(request: NextRequest, response: NextResponse) {
-  // const agent = await getSessionAgent();
-  const clientSession = await getSession();
-  console.log("Session: ", clientSession);
 
-  logger.info("Session as from Client: ", clientSession);
+export async function GET(req: NextRequest) {
+    const clientSession = await getSession();
+    const agent = await getSessionAgent();
 
-  try {
-    // const { data: profileRecord } = await agent.com.atproto.repo.getRecord({
-    //     repo: agent.assertDid,
-    //     collection: "app.bsky.actor.profile",
-    //     rkey: "self",
-    // })
+    if (!agent) {
+        logger.error("AGENT BHETINA YAR!")
+        return NextResponse.redirect(new URL("/login", req.url));
+    }
 
-    // Safely extract the displayName
-    // const displayName = profileRecord.value?.displayName
+    try {
+        const { data: profileRecord } = await agent.getProfile({
+            actor:clientSession.did
+        })
 
-    return Response.json({ name: "Alex" });
-  } catch (err) {
-    console.error("Error fetching profile:", err);
-    return new Response("Error fetching profile", { status: 500 });
-  }
+        // It is showing display name is not found, shall find a way to remove this error
+        const user = createUser(profileRecord);
+        
+        return Response.json(user)
+    } catch (err) {
+        console.error("Error fetching profile:", err)
+        return new Response("Error fetching profile", { status: 500 })
+    }
 }

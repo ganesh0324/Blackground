@@ -6,57 +6,35 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Post } from "@/components/feed/post";
 import { samplePosts } from "@/lib/constants";
 import { Edit, Settings, Users } from "lucide-react";
-import getSession from "@/lib/auth/agent";
 import { useEffect, useState } from "react";
 import { User } from "../functions/create-user";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User>();
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    fetch("/api/session", { cache: "no-store" })
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data.user);
-      });
-  }, []);
+    async function fetchProfile() {
+      try {
+        console.log("FETCHING PROFILE DETAILS NOW!")
+
+        const res = await fetch("/api/profile")
+
+        if (!res.ok) throw new Error("Failed to fetch profile")
+        const data = await res.json()
+        setUser(data)
+      } catch (err) {
+        setError("Failed to load profile")
+        console.error("Fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProfile()
+  }, [])
 
   if (!user) return <div>Loading...</div>;
-
-  // const duser = {
-  //   name: "User Name",
-  //   handle: "username",
-  //   bio: "Decentralized social media enthusiast | Web3 Developer | Exploring the future of online communities",
-  //   followers: 1024,
-  //   following: 256,
-  //   posts: 128,
-  //   joinedDate: "January 2023",
-  // };
-  // useEffect(() => {
-  //   async function fetchProfile() {
-  //     try {
-  //       console.log("FETCHING PROFILE DETAILS NOW!");
-
-  //       const res = await fetch("/api/profile", { cache: "no-store" });
-
-  //       if (!res.ok) throw new Error("Failed to fetch profile");
-  //       const data = await res.json();
-  //       duser.name = data.name;
-  //       setUser(duser);
-  //     } catch (err) {
-  //       setError("Failed to load profile");
-  //       console.error("Fetch error:", err);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
-
-  //   fetchProfile();
-  // }, []);
-
-  // if (loading) return <p className="p-8 text-center">Loading profile...</p>;
-  // if (error || !user)
-  //   return <p className="p-8 text-center text-red-500">{error}</p>;
 
   return (
     <div className="flex flex-col min-h-screen">
