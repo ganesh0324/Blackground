@@ -60,7 +60,6 @@ export class SessionStore implements NodeSavedSessionStore {
 
 export function getClientMetadata(): OAuthClientMetadataInput {
   const baseUrl: string = env.PUBLIC_URL;
-
   return {
     client_name: "BlackGround",
     client_id: `${baseUrl}/client-metadata.json`,

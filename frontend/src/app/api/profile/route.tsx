@@ -16,12 +16,12 @@ export async function GET(req: NextRequest) {
 
     try {
         const { data: profileRecord } = await agent.getProfile({
-            actor:clientSession.did
+            actor: clientSession.did
         })
 
         // It is showing display name is not found, shall find a way to remove this error
         const user = createUser(profileRecord);
-        
+
         return Response.json(user)
     } catch (err) {
         console.error("Error fetching profile:", err)

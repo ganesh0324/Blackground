@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,7 @@ import { User } from "../functions/create-user";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User>();
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+
 
   useEffect(() => {
     async function fetchProfile() {
@@ -25,10 +24,7 @@ export default function ProfilePage() {
         const data = await res.json()
         setUser(data)
       } catch (err) {
-        setError("Failed to load profile")
         console.error("Fetch error:", err)
-      } finally {
-        setLoading(false)
       }
     }
     fetchProfile()
@@ -48,7 +44,7 @@ export default function ProfilePage() {
           <div className="flex justify-between items-start relative -mt-16">
             <Avatar className="h-32 w-32 border-4 border-background">
               <AvatarImage
-                src={user.avatar ?? "/placeholder.svg?height=128&width=128"}
+                src={user.avatar ?? "/person.jpg?height=128&width=128"}
                 // src="/placeholder.svg?height=128&width=128"
                 alt={user.name}
               />

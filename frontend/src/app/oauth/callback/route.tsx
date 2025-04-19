@@ -17,25 +17,11 @@ export async function GET(request: NextRequest) {
 
   try {
 
-
-    // // Create a Bluesky client
-
-
-    // // Create an agent
-    // const agent = new Agent(session);
-
-    // // Get the profile of the user
-    // const { data } = await agent.getProfile({
-    //   actor: session.did,
-    // });
-
-    // Get the session and state from the callback
-
-    // Create a user from the Bluesky profile
     const clientSession = await getSession();
 
     // Save the user to the session
     clientSession.did = session.did;
+    
     // Save the session
     await clientSession.save();
     // Redirect to the private page

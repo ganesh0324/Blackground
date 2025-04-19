@@ -3,7 +3,7 @@ import { cleanEnv, host, port, str, testOnly } from "envalid";
 
 dotenv.config();
 
-let url : String = "https://d7d1-113-199-230-231.ngrok-free.app";
+let url : String = "https://17e4-2407-1400-aa3f-9fe8-e0ae-f2a5-3816-e699.ngrok-free.app";
 
 export const env = cleanEnv(process.env, {
   NODE_ENV: str({
