@@ -8,14 +8,29 @@ export interface Feed {
 export type FeedTab = keyof Feed;
 
 export interface PostProps {
-  id: number | string;
-  username: string;
-  handle: string;
-  avatarSrc: string;
+  id: number;
   content: string;
-  imageSrc?: string;
-  timeAgo: string;
-  likes: number;
-  comments: number;
-  shares: number;
+  handle: string;
+  avatar?: string;
+  displayName: string;
+  createdAt: string;
+  timeAgo?: string;
+  image?: { url: string; alt: string } | null;
+  likes? : number;
+  comments?: number;
+  shares?: number;
+  retweets?: number;
 }
+
+// export interface PostProps {
+//   id: number | string;
+//   username: string;
+//   handle: string;
+//   avatarSrc: string;
+//   content: string;
+//   imageSrc?: string;
+//   timeAgo: string;
+//   likes: number;
+//   comments: number;
+//   shares: number;
+// }

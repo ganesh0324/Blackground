@@ -9,9 +9,19 @@ import { Edit, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { User } from "../functions/create-user";
 
+interface PostProps {
+  id: string;
+  content: string;
+  handle: string;
+  avatar: string | null;
+  displayName: string;
+  createdAt: string;
+  image?: { url: string; alt: string } | null;
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState<User>();
-
+  const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -22,7 +32,10 @@ export default function ProfilePage() {
 
         if (!res.ok) throw new Error("Failed to fetch profile")
         const data = await res.json()
-        setUser(data)
+        setUser(data.user)
+        console.log("User data:", data)
+        setPosts(data.posts);
+
       } catch (err) {
         console.error("Fetch error:", err)
       }
@@ -131,22 +144,17 @@ export default function ProfilePage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* <TabsContent value="posts" className="p-4 sm:p-6 lg:p-8">
+          <TabsContent value="posts" className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-2xl mx-auto space-y-4">
-              {Object.values(samplePosts)
-                .flat()
-                .filter((post) => post.handle === user.handle).length > 0 ? (
-                Object.values(samplePosts)
-                  .flat()
-                  .filter((post) => post.handle === user.handle)
-                  .map((post) => <Post key={post.id} {...post} />)
+              {posts.length > 0 ? (
+                posts.map((post) => <Post key={post.id} {...post} />)
               ) : (
                 <p className="text-center text-muted-foreground py-8">
                   No posts yet
                 </p>
               )}
             </div>
-          </TabsContent> */}
+          </TabsContent>
 
           <TabsContent value="replies" className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-2xl mx-auto">

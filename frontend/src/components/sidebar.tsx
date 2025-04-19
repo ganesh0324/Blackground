@@ -111,15 +111,15 @@ export default function AppSidebar({
               <div className="flex items-center gap-3">
                 <Avatar>
                   <AvatarImage
-                    src="/placeholder.svg?height=40&width=40"
+                    src="/person.jpg?height=40&width=40"
                     alt="User"
                   />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 overflow-hidden">
-                  <p className="truncate text-sm font-medium">Ganesh Parajuli</p>
+                  <p className="truncate text-sm font-medium">Dhiruuuuu</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    @blaugranesh
+                    @dhiraj66.bsky.social
                   </p>
                 </div>
                 <Button

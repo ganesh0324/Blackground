@@ -4,9 +4,9 @@ export const samplePosts: Feed = {
   Discover: [
     {
       id: 1,
-      username: "Dhiru Don",
+      displayName: "Dhiru Don",
       handle: "dhireyy",
-      avatarSrc: "",
+      avatar: "",
       content:
         "Just launched my new project! Check it out and let me know what you think. #NewProject #Excited",
       timeAgo: "2h",
@@ -17,10 +17,10 @@ export const samplePosts: Feed = {
     },
     {
       id: 2,
-      username: "biggie",
+      displayName: "biggie",
       handle: "chiggie",
-      avatarSrc: "",
-      imageSrc: "/placeholder.jpg",
+      avatar: "",
+      image: {url: "/placeholder.jpg", alt: "Post Image"},
 
       content:
         "Shadows create their own reality. #Shadows #Reality #Perception",
@@ -32,9 +32,9 @@ export const samplePosts: Feed = {
     },
     {
       id: 3,
-      username: "Bajra",
+      displayName: "Bajra",
       handle: "kalobajra",
-      avatarSrc: "",
+      avatar: "",
       content:
         "Just finished reading an incredible book on AI and its impact on society. Highly recommend it to everyone interested in tech and ethics!",
       timeAgo: "1d",
@@ -47,9 +47,9 @@ export const samplePosts: Feed = {
   Following: [
     {
       id: 4,
-      username: "Tech News",
+      displayName: "Tech News",
       handle: "technews",
-      avatarSrc: "",
+      avatar: "",
       content:
         "Breaking: Major breakthrough in quantum computing announced! This could revolutionize the tech industry. #QuantumComputing #TechNews",
       timeAgo: "3h",
@@ -62,9 +62,9 @@ export const samplePosts: Feed = {
   Trending: [
     {
       id: 5,
-      username: "Climate Action",
+      displayName: "Climate Action",
       handle: "climateaction",
-      avatarSrc: "",
+      avatar: "",
       content:
         "Global leaders commit to ambitious climate goals at the latest summit. What are your thoughts on the proposed measures? #ClimateAction #Sustainability",
       timeAgo: "6h",
@@ -77,9 +77,9 @@ export const samplePosts: Feed = {
   "Hot Topics": [
     {
       id: 6,
-      username: "Health & Wellness",
+      displayName: "Health & Wellness",
       handle: "healthwellness",
-      avatarSrc: "",
+      avatar: "",
       content:
         "New study shows the benefits of mindfulness and meditation on mental health. Have you tried these practices? #MentalHealth #Wellness",
       timeAgo: "1d",

@@ -80,7 +80,7 @@ export function CreatePostDialog({ children }: { children: React.ReactNode }) {
         </div>
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            // THIS IS THE IMAGE BUTTON
+
             <Button
               variant="ghost"
               size="icon"
